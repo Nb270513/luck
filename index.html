@@ -1,21 +1,199 @@
-<head>
-<meta charset="UTF-8">
-<style>
-body {
-  margin:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:black;
-  color:red;
-  font-size:80px;
-  font-weight:bold;
-  font-family:Arial;
-}
-</style>
-</head>
-<body>
-Fuck you
-</body>
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lustiger Ladebildschirm</title>
+    <style>
+      :root {
+        --bg: #080808;
+        --panel: #151515;
+        --text: #d9ffe3;
+        --ok: #41ff79;
+        --warn: #ffd166;
+        --err: #ff5d5d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: radial-gradient(circle at top, #1a1a1a, var(--bg) 60%);
+        color: var(--text);
+        font-family: "Courier New", monospace;
+      }
+
+      .app {
+        width: min(760px, 100%);
+        border: 1px solid #2e2e2e;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--panel);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .header {
+        padding: 10px 14px;
+        border-bottom: 1px solid #2e2e2e;
+        background: #1e1e1e;
+        color: #bfbfbf;
+        font-size: 14px;
+      }
+
+      .content {
+        padding: 18px;
+      }
+
+      .title {
+        margin: 0 0 10px;
+        color: var(--err);
+        font-size: 20px;
+      }
+
+      .subtitle {
+        margin: 0 0 14px;
+        color: #b7b7b7;
+        font-size: 14px;
+      }
+
+      #log {
+        min-height: 175px;
+      }
+
+      .line {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .err {
+        color: var(--err);
+      }
+
+      .bar-wrap {
+        margin-top: 8px;
+      }
+
+      .bar-label {
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .bar {
+        width: 100%;
+        height: 15px;
+        border-radius: 999px;
+        border: 1px solid #2d6c3f;
+        background: #101910;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, #209340, #47ff82);
+        transition: width 0.2s linear;
+      }
+
+      .reveal {
+        margin-top: 16px;
+        padding: 12px;
+        border: 1px dashed #2d8a46;
+        border-radius: 8px;
+        background: rgba(71, 255, 130, 0.08);
+        display: none;
+      }
+
+      .hint {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #8f998f;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="header">fun-scan.exe</div>
+
+      <section class="content">
+        <h1 class="title">⚠️ Kritischer Browser-Fehler erkannt!</h1>
+        <p class="subtitle">Keine Sorge: Das ist ein lustiger Fake-Ladebildschirm.</p>
+
+        <div id="log"></div>
+
+        <div class="bar-wrap">
+          <div class="bar-label" id="barLabel">System wird geprüft ...</div>
+          <div class="bar" aria-label="Ladefortschritt">
+            <div class="bar-fill" id="barFill"></div>
+          </div>
+        </div>
+
+        <div class="reveal" id="revealBox">
+          😄 Auflösung: Alles nur ein Scherz. Dein Gerät hat kein Virus.
+        </div>
+
+        <p class="hint">Tipp: Du kannst die Texte unten im JavaScript einfach ändern.</p>
+      </section>
+    </main>
+
+    <script>
+      // Einfache Schritt-Liste für den Fake-Scan.
+      const steps = [
+        { text: "[OK] Starte Prüfung der Browser-Snacks ...", type: "ok", progress: 10 },
+        { text: "[WARN] Zu viele Tabs entdeckt (mögliches Chaos)", type: "warn", progress: 24 },
+        { text: "[ERR] Fehlercode 0xLOL entdeckt", type: "err", progress: 38 },
+        { text: "[WARN] Buchstaben wirken kurz komisch ...", type: "warn", progress: 54 },
+        { text: "[OK] Repariere Humor-Modul", type: "ok", progress: 68 },
+        { text: "[ERR] Unerwartete Meme-Explosion", type: "err", progress: 82 },
+        { text: "[OK] Stabilisiere System mit Katzenvideo", type: "ok", progress: 95 },
+        { text: "[OK] Scan abgeschlossen", type: "ok", progress: 100 }
+      ];
+
+      const log = document.getElementById("log");
+      const barFill = document.getElementById("barFill");
+      const barLabel = document.getElementById("barLabel");
+      const revealBox = document.getElementById("revealBox");
+
+      let index = 0;
+
+      function addLine(step) {
+        const p = document.createElement("p");
+        p.className = `line ${step.type}`;
+        p.textContent = step.text;
+        log.appendChild(p);
+      }
+
+      function nextStep() {
+        if (index >= steps.length) {
+          barLabel.textContent = "Fertig";
+          revealBox.style.display = "block";
+          return;
+        }
+
+        const step = steps[index];
+        addLine(step);
+
+        barFill.style.width = `${step.progress}%`;
+        barLabel.textContent = `Ladefortschritt: ${step.progress}%`;
+
+        index += 1;
+        setTimeout(nextStep, 850);
+      }
+
+      setTimeout(nextStep, 500);
+    </script>
+  </body>
 </html>
