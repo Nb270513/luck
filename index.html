@@ -1,21 +1,241 @@
-<head>
-<meta charset="UTF-8">
-<style>
-body {
-  margin:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:black;
-  color:red;
-  font-size:80px;
-  font-weight:bold;
-  font-family:Arial;
-}
-</style>
-</head>
-<body>
-Fuck you
-</body>
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Systemprüfung läuft...</title>
+    <style>
+      :root {
+        --bg: #050505;
+        --panel: #111;
+        --green: #33ff66;
+        --red: #ff4b4b;
+        --yellow: #ffd166;
+        --text: #e6ffe9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, #101010, var(--bg) 55%);
+        color: var(--text);
+        font-family: "Courier New", monospace;
+        padding: 16px;
+      }
+
+      .card {
+        width: min(760px, 100%);
+        background: var(--panel);
+        border: 1px solid #2d2d2d;
+        border-radius: 12px;
+        box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: #191919;
+        border-bottom: 1px solid #2d2d2d;
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+
+      .dot.red {
+        background: #ff5f57;
+      }
+
+      .dot.yellow {
+        background: #febc2e;
+      }
+
+      .dot.green {
+        background: #28c840;
+      }
+
+      .title {
+        margin-left: 8px;
+        font-size: 14px;
+        color: #bbbbbb;
+      }
+
+      .content {
+        padding: 18px;
+      }
+
+      .warning {
+        color: var(--red);
+        font-size: 18px;
+        margin-bottom: 14px;
+        font-weight: bold;
+      }
+
+      .line {
+        margin: 6px 0;
+        font-size: 16px;
+        min-height: 1.2em;
+      }
+
+      .line.ok {
+        color: var(--green);
+      }
+
+      .line.warn {
+        color: var(--yellow);
+      }
+
+      .line.err {
+        color: var(--red);
+      }
+
+      .progress-wrap {
+        margin-top: 18px;
+      }
+
+      .progress-label {
+        font-size: 14px;
+        margin-bottom: 7px;
+        color: #b8ffcb;
+      }
+
+      .bar {
+        width: 100%;
+        height: 16px;
+        border: 1px solid #336640;
+        border-radius: 999px;
+        background: #0b160d;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #1f9f3d, #43ff7e);
+        transition: width 0.2s linear;
+      }
+
+      .hint {
+        margin-top: 14px;
+        color: #9ba39d;
+        font-size: 13px;
+      }
+
+      .final-joke {
+        margin-top: 16px;
+        padding: 12px;
+        border: 1px dashed #2d8a46;
+        border-radius: 8px;
+        background: rgba(31, 159, 61, 0.1);
+        color: #b7ffd0;
+        display: none;
+      }
+
+      .glitch {
+        letter-spacing: 1px;
+        animation: shake 0.15s linear infinite;
+      }
+
+      @keyframes shake {
+        0% { transform: translate(0, 0); }
+        25% { transform: translate(-1px, 1px); }
+        50% { transform: translate(1px, 0); }
+        75% { transform: translate(0, -1px); }
+        100% { transform: translate(0, 0); }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="topbar">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="title">security-scan.exe</span>
+      </div>
+
+      <section class="content">
+        <div class="warning">⚠️ Kritischer Fehler erkannt! (oder vielleicht doch nicht...)</div>
+
+        <div id="log"></div>
+
+        <div class="progress-wrap">
+          <div class="progress-label" id="progressLabel">Analysiere Browser-Daten...</div>
+          <div class="bar" aria-label="Fortschritt">
+            <div class="bar-fill" id="barFill"></div>
+          </div>
+        </div>
+
+        <div class="final-joke" id="finalJoke">
+          😄 Entwarnung! Das war nur ein Scherz-Ladebildschirm.<br />
+          Dein Gerät ist okay. Willkommen auf der lustigen Webseite.
+        </div>
+
+        <p class="hint">Tipp: Diese Seite ist nur zur Unterhaltung gedacht.</p>
+      </section>
+    </main>
+
+    <script>
+      const logEl = document.getElementById("log");
+      const barFill = document.getElementById("barFill");
+      const progressLabel = document.getElementById("progressLabel");
+      const finalJoke = document.getElementById("finalJoke");
+
+      const steps = [
+        { text: "[OK] Starte Sicherheitsprüfung...", cls: "ok", progress: 8 },
+        { text: "[OK] Suche nach verdächtigen Cookies...", cls: "ok", progress: 19 },
+        { text: "[WARN] 12.482 Meme-Dateien gefunden", cls: "warn", progress: 34 },
+        { text: "[ERR] Tastatur spricht plötzlich Latein", cls: "err", progress: 43 },
+        { text: "[WARN] Lade Anti-Virus-Modul: banana.dll", cls: "warn", progress: 57 },
+        { text: "[ERR] Fehlercode: LOL-404-HAHA", cls: "err", progress: 64 },
+        { text: "[OK] Repariere Realität...", cls: "ok", progress: 77 },
+        { text: "[WARN] Buchstaben werden ko̴m̶i̵s̸c̶h̷", cls: "warn glitch", progress: 85 },
+        { text: "[OK] Beruhige CPU mit Katzenvideo", cls: "ok", progress: 95 },
+        { text: "[OK] Abschluss in 3...2...1...", cls: "ok", progress: 100 }
+      ];
+
+      let stepIndex = 0;
+
+      function addLogLine(step) {
+        const line = document.createElement("p");
+        line.className = `line ${step.cls}`;
+        line.textContent = step.text;
+        logEl.appendChild(line);
+      }
+
+      function runFakeScan() {
+        if (stepIndex >= steps.length) {
+          progressLabel.textContent = "Scan abgeschlossen";
+          finalJoke.style.display = "block";
+          return;
+        }
+
+        const step = steps[stepIndex];
+        addLogLine(step);
+        barFill.style.width = `${step.progress}%`;
+
+        if (step.progress < 100) {
+          progressLabel.textContent = `Ladevorgang ${step.progress}%`;
+        }
+
+        stepIndex += 1;
+
+        const delay = 650 + Math.random() * 900;
+        setTimeout(runFakeScan, delay);
+      }
+
+      setTimeout(runFakeScan, 450);
+    </script>
+  </body>
 </html>
